@@ -5,6 +5,7 @@
 require 'db.php';
 require 'admin/rcon/rcon/rcon.php';
 require_once("libs/WebsenderAPI.php");
+require_once("libs/YuKassa.php");
 
 if ($_POST['id'] == null) {
   header("Location: /");
@@ -20,6 +21,7 @@ $unitpay = R::findOne('unitpay', ' id = ? ', ['1']);
 $anypay = R::findOne('anypay', ' id = ? ', ['1']);
 $payok = R::findOne('payok', ' id = ? ', ['1']);
 $aaio = R::findOne('aaio', ' id = ? ', ['1']);
+$yukassa = R::findOne('yukassa', ' id = ? ', ['1']);
 $t = false;
 $shopsettings = R::findOne('shopsettings', ' id = ? ', [ '1' ]);
 $rcon = R::findOne('rcon', ' id = ? ', [ '1' ]);
@@ -108,6 +110,7 @@ if ($product->sale != null or $product->sale != "-") {
 
 
 if ($freekassa == null and $enot == null and $unitpay == null and $anypay == null and $payok == null and $aaio == null) {
+if ($freekassa == null and $enot == null and $unitpay == null and $anypay == null and $payok == null and $aaio == null and $yukassa == null) {
   header("Location: /error?err=3");
 } else {
   if ($rcon1->connect()) {
@@ -168,6 +171,30 @@ header("Location: ".'https://aaio.io/merchant/pay?' . http_build_query([
   'desc' => $descaa,
   'lang' => $langaa
 ]));
+        }
+        if ($_POST['system'] == "yukassa") {
+          if ($type == "curr") {
+            setPayment($nick, $_POST['id'], $curr, $finalPrice, "ЮKassa", "Не оплачено", $promo, $_POST['kol']);
+          } else {
+            setPayment($nick, $_POST['id'], $curr, $finalPrice, "ЮKassa", "Не оплачено", $promo, null);
+          }
+          
+          $order = R::findOne('payments', 'ORDER BY id DESC');
+          $yukassa_api = new YuKassa($yukassa->shop_id, $yukassa->secret_key);
+          
+          $payment = $yukassa_api->createPayment(
+            $finalPrice,
+            $curr == 'RUB' ? 'RUB' : 'RUB', // ЮKassa работает только с рублями
+            'Покупка товара ' . $product->name . ' для игрока ' . $nick,
+            'https://' . $_SERVER['HTTP_HOST'] . '/succes',
+            ['order_id' => $order->id, 'nick' => $nick]
+          );
+          
+          if ($payment && isset($payment['confirmation']['confirmation_url'])) {
+            header("Location: " . $payment['confirmation']['confirmation_url']);
+          } else {
+            header("Location: /error?err=3");
+          }
         }
         if ($_POST['system'] == "anypay") {
           $si = $anypay->shop_id;

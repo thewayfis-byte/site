@@ -21,6 +21,7 @@ $unitpay = R::findOne('unitpay', ' id = ? ', ['1']);
 $anypay = R::findOne('anypay', ' id = ? ', ['1']);
 $payok = R::findOne('payok', ' id = ? ', ['1']);
 $aaio = R::findOne('aaio', ' id = ? ', ['1']);
+$yukassa = R::findOne('yukassa', ' id = ? ', ['1']);
 
 $ccolor = R::findOne('customcolor', 'id = ?', ['1']);
 $conv = R::findOne('curr', 'id = ?', ['1']);
@@ -362,6 +363,9 @@ y = false;
     $("#aaio").click(function() {
       $("#sis").val("aaio");
     });
+    $("#yukassa").click(function() {
+      $("#sis").val("yukassa");
+    });
     $("#close").click(function() {
       $(".dialog1").hide();
       $(".dialog2").hide();
@@ -433,8 +437,11 @@ $(".wmz").click(function() {
     <button id="aaio" class="as" formtarget="_parent" type="submit" style="width: 100%; background-color: white; border-radius: 15px; padding: 0px; margin-top: 0px; border: 0; margin-bottom: 15px;"><img src="img/aaio.jpg" style="height: 45px; margin-top: 5px;"></button>
 
   <?php endif; ?>
+  <?php if ($yukassa != null): ?>
+    <button id="yukassa" class="as" formtarget="_parent" type="submit" style="width: 100%; background-color: white; border-radius: 15px; padding: 0px; margin-top: 0px; border: 0; margin-bottom: 15px;"><img src="img/yukassa.jpg" style="height: 45px; margin-top: 5px;"></button>
 
-  <?php if ($freekassa == null and $enot == null and $unitpay == null and $anypay == null and $payok == null and $aaio == null): ?>
+  <?php endif; ?>
+  <?php if ($freekassa == null and $enot == null and $unitpay == null and $anypay == null and $payok == null and $aaio == null and $yukassa == null): ?>
     <br><h5 align="center">Пусто...</h5><br><br>
   <?php endif; ?>
 
